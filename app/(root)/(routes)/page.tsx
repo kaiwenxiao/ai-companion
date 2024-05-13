@@ -1,9 +1,11 @@
 import { UserButton } from "@clerk/nextjs";
+import { SearchInput } from "@/components/search-input";
 
 const RootPage = () => {
   return (
-    <div>
-      <UserButton afterSignOutUrl="/sign-in" />
+    <div className="h-full p-4 space-y-2">
+      {/*<UserButton afterSignOutUrl="/sign-in" />*/}
+      <SearchInput />
     </div>
   );
 };

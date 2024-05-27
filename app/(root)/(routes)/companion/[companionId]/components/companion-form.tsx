@@ -27,6 +27,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface CompanionFormProps {
   initialData: Companion;
@@ -67,10 +70,14 @@ const formSchema = z.object({
     message: "Category is required",
   }),
 });
+
 export const CompanionForm = ({
   categories,
   initialData,
 }: CompanionFormProps) => {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
@@ -86,7 +93,24 @@ export const CompanionForm = ({
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    try {
+      if (initialData) {
+        await axios.patch(`/api/companion/${initialData.id}`, values);
+      } else {
+        await axios.post(`/api/companion`, values);
+      }
+      toast({
+        description: "success",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Something went wrong",
+      });
+
+      // refresh our server component, ensuring those upsert data will be latest
+      router.refresh();
+    }
   };
 
   return (
